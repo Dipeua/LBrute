@@ -7,3 +7,5 @@ Usage:
 ```
 python3 lbrute.py -u http://<target>/login -w <userwordlist>
 ```
+
+![](./banner.png)
