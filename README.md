@@ -1,5 +1,5 @@
 # LBrute
-LBrute is a very very very basic brute force tool that I created to learn requests, argparser and other Python modules.
+Brute is a very very very basic brute force tool that I created to learn requests, argparse and other python modules.
 
 By default it uses the rockyou.txt password file present in all pentest distributions.
 
