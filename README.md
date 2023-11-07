@@ -2,8 +2,6 @@
 Lbrute is a very very very basic a brute force tool in Python that attempts to automatically log into a login page by testing all possible combinations of usernames and passwords, and displays valid credentials if any are found.
 I created to learn requests, argparse and other python modules.
 
-By default it uses the rockyou.txt password file present in all pentest distributions.
-
 **Usage:**
 ```
 usage: lbrute.py [-h] -u URL -n USERLIST -w WORDLIST [-v]
