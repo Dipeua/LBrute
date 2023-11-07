@@ -28,6 +28,6 @@ python lbrute.py --url http://192.168.45.129/dvwa/login.php --userlist users.txt
 
 
 
-![](./banner.png)
+![](./banner.jpg)
 
 @Ber1y
