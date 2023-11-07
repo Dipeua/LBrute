@@ -21,7 +21,7 @@ _Exemple:_
 in this example I used the [DVWA (Damn Vulnerable Web Application)](https://sourceforge.net/projects/dvwa.mirror/files/latest/download)  login page.
 
 ```
-python lbrute.py --url http://192.168.45.129/dvwa/login.php --userlist users.txt --wordlist pass.txt
+python lbrute.py --url http://192.168.45.129/dvwa/login.php --userlist users.txt --wordlist pass.txt -v
 ```
 
 
